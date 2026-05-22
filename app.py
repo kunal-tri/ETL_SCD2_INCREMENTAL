@@ -148,7 +148,7 @@ if input_mode == "Upload CSV":
 
         st.dataframe(
             df.head(20),
-            use_container_width=True
+            width='stretch'
         )
 
         st.write(
@@ -561,7 +561,7 @@ if input_mode == "Upload CSV":
 
                     st.dataframe(
                         final_df.tail(50),
-                        use_container_width=True
+                        width='stretch'
                     )
 
                     col1, col2, col3 = (
@@ -720,7 +720,7 @@ elif input_mode == "Manual Entry":
                     
                         display_df.tail(20),
                     
-                        use_container_width=True
+                        width='stretch'
                     )
 
                 except Exception as e:
@@ -826,7 +826,7 @@ elif input_mode == "Manual Entry":
                     
                         display_df.tail(20),
                     
-                        use_container_width=True
+                        width='stretch'
                     )
                 except Exception as e:
 
@@ -906,7 +906,7 @@ elif input_mode == "Manual Entry":
                     
                         display_df.tail(20),
                     
-                        use_container_width=True
+                        width='stretch'
                     )
 
                 except Exception as e:
