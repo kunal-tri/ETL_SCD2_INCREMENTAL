@@ -461,18 +461,7 @@ def run_incremental_scd2_pipeline(
 
         new_record = row.to_dict()
 
-        existing_rows = final_df[
-            (
-                final_df[BUSINESS_KEY]
-                ==
-                new_record[BUSINESS_KEY]
-            )
-            &
-            (
-                final_df["is_current"]
-                == "Y"
-            )
-        ]
+        existing_rows = final_df[(final_df[BUSINESS_KEY]==new_record[BUSINESS_KEY]) &(final_df["is_current"]== "Y")]
 
         now = (
             datetime.now(
@@ -567,11 +556,7 @@ def run_incremental_scd2_pipeline(
 
                     continue
 
-                if (
-                    str(new_val).strip()
-                    !=
-                    str(old_val).strip()
-                ):
+                if (str(new_val).strip()!=str(old_val).strip()):
 
                     changed = True
 
