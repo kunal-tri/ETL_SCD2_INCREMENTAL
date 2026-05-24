@@ -144,15 +144,11 @@ def send_email_alert(message):
 
         server.quit()
 
-        print(
-            "Email alert sent"
-        )
+        print("Email alert sent")
 
     except Exception as e:
 
-        print(
-            f"Email alert failed: {e}"
-        )
+        print(f"Email alert failed: {e}")
 
 def send_slack_alert(message):
 
@@ -252,11 +248,7 @@ def run_incremental_scd2_pipeline(
         uploaded_columns
     )
 
-    extra_columns = list(
-        uploaded_columns
-        -
-        expected_columns
-    )
+    extra_columns = list(uploaded_columns - expected_columns)
 
     if missing_columns or extra_columns:
 
