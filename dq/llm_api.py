@@ -46,9 +46,7 @@ def load_context_from_s3(
             .decode("utf-8")
         )
 
-        context = json.loads(
-            context_data
-        )
+        context = json.loads(context_data)
 
         print(
             f"Loaded context from "
@@ -89,9 +87,7 @@ def save_json_to_s3(
 
             Body=json_data,
 
-            ContentType=(
-                "application/json"
-            )
+            ContentType=("application/json")
         )
 
         print(
@@ -232,18 +228,11 @@ def parse_llm_response(response):
             .strip()
         )
 
-        parsed_response = json.loads(
-            cleaned_response
-        )
+        parsed_response = json.loads(cleaned_response)
 
-        if (
-            "recommended_fixes"
-            not in parsed_response
-        ):
+        if ("recommended_fixes" not in parsed_response):
 
-            parsed_response[
-                "recommended_fixes"
-            ] = []
+            parsed_response["recommended_fixes"] = []
 
         return parsed_response
 
@@ -296,13 +285,9 @@ def analyze_dataset_from_s3(
                 "Context loading failed"
             )
 
-        prompt = build_prompt(
-            context
-        )
+        prompt = build_prompt(context)
 
-        llm_response = call_llm(
-            prompt
-        )
+        llm_response = call_llm(prompt)
 
         parsed_response = (
             parse_llm_response(
@@ -329,9 +314,7 @@ def analyze_dataset_from_s3(
 
             "severity": "ERROR",
 
-            "issues": [
-                str(e)
-            ],
+            "issues": [str(e)],
 
             "root_cause": (
                 traceback.format_exc()
