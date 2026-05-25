@@ -23,13 +23,9 @@ def read_parquet_from_s3(
         Key=parquet_key
     )
 
-    parquet_data = BytesIO(
-        response["Body"].read()
-    )
+    parquet_data = BytesIO(response["Body"].read())
 
-    df = pd.read_parquet(
-        parquet_data
-    )
+    df = pd.read_parquet(parquet_data)
 
     return df
 
@@ -45,9 +41,7 @@ def write_parquet_to_s3(
 
     parquet_buffer = BytesIO()
 
-    datetime_columns = df.select_dtypes(
-        include=["datetime"]
-    ).columns
+    datetime_columns = df.select_dtypes(include=["datetime"]).columns
 
     for col in datetime_columns:
 
@@ -92,23 +86,13 @@ def apply_safe_remediation(
 
     for fix in fixes:
 
-        action = fix.get(
-            "action"
-        )
+        action = fix.get("action")
 
-        column = fix.get(
-            "column"
-        )
+        column = fix.get("column")
 
-        strategy = fix.get(
-            "strategy"
-        )
+        strategy = fix.get("strategy")
 
-        if (
-            column
-            and
-            column not in df.columns
-        ):
+        if (column and column not in df.columns):
 
             continue
 
@@ -117,28 +101,17 @@ def apply_safe_remediation(
             f"{action}"
         )
 
-        # -----------------------------------
+        
         # NULL STRING FIX
-        # -----------------------------------
+        
 
         if action == "fill_nulls":
 
-            before_nulls = (
-                df[column]
-                .isnull()
-                .sum()
-            )
+            before_nulls = (df[column].isnull().sum())
 
-            df[column] = (
-                df[column]
-                .fillna(strategy)
-            )
+            df[column] = (df[column].fillna(strategy))
 
-            after_nulls = (
-                df[column]
-                .isnull()
-                .sum()
-            )
+            after_nulls = (df[column].isnull().sum())
 
             remediation_log.append({
 
@@ -146,35 +119,20 @@ def apply_safe_remediation(
 
                 "column": column,
 
-                "before_nulls": int(
-                    before_nulls
-                ),
+                "before_nulls": int(before_nulls),
 
-                "after_nulls": int(
-                    after_nulls
-                )
+                "after_nulls": int(after_nulls)
             })
 
-        # -----------------------------------
         # NUMERIC NULL FIX
-        # -----------------------------------
 
-        elif action == (
-            "fill_numeric_nulls"
-        ):
+        elif action == ("fill_numeric_nulls"):
 
-            before_nulls = (
-                df[column]
-                .isnull()
-                .sum()
-            )
+            before_nulls = (df[column].isnull().sum())
 
             if strategy == "median":
 
-                median_value = (
-                    df[column]
-                    .median()
-                )
+                median_value = (df[column].median())
 
                 df[column] = (
                     df[column]
@@ -185,16 +143,9 @@ def apply_safe_remediation(
 
             elif strategy == "zero":
 
-                df[column] = (
-                    df[column]
-                    .fillna(0)
-                )
+                df[column] = (df[column].fillna(0))
 
-            after_nulls = (
-                df[column]
-                .isnull()
-                .sum()
-            )
+            after_nulls = (df[column].isnull().sum())
 
             remediation_log.append({
 
@@ -202,30 +153,18 @@ def apply_safe_remediation(
 
                 "column": column,
 
-                "before_nulls": int(
-                    before_nulls
-                ),
+                "before_nulls": int(before_nulls),
 
-                "after_nulls": int(
-                    after_nulls
-                )
+                "after_nulls": int(after_nulls)
             })
 
         
-        # -----------------------------------
         # WHITESPACE CLEANING
-        # -----------------------------------
+    
 
-        elif action == (
-            "strip_whitespace"
-        ):
+        elif action == ("strip_whitespace"):
 
-            df[column] = (
-
-                df[column]
-                .astype(str)
-                .str.strip()
-            )
+            df[column] = (df[column].astype(str).str.strip())
 
             remediation_log.append({
 
@@ -234,13 +173,10 @@ def apply_safe_remediation(
                 "column": column
             })
 
-        # -----------------------------------
+        
         # INVALID DATE COERCION
-        # -----------------------------------
-
-        elif action == (
-            "coerce_dates"
-        ):
+        
+        elif action == ("coerce_dates"):
 
             invalid_before = (
                 pd.to_datetime(
