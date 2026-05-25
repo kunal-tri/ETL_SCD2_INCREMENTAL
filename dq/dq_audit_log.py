@@ -5,9 +5,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 
-INDIA_TZ = ZoneInfo(
-    "Asia/Kolkata"
-)
+INDIA_TZ = ZoneInfo("Asia/Kolkata")
 
 
 s3_client = boto3.client(
