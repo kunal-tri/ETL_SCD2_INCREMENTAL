@@ -6,15 +6,11 @@ python-dotenv
 pyspark
 boto3
 s3fs
-pandas
 numpy
 scikit-learn
 streamlit
 pyarrow
 fastparquet
-google-generativeai
 requests
 python-dotenv
-google-generativeai
-google.genai
 groq
