@@ -58,22 +58,14 @@ s3_client = boto3.client(
 )
 
 
-STATE_FILE = (
-    "ai_dq_state.json"
-)
+STATE_FILE = ("ai_dq_state.json")
 
 
-PARQUET_PREFIX = (
-    "output/parquet-data/"
-)
+PARQUET_PREFIX = ("output/parquet-data/")
 
-CONTEXT_PREFIX = (
-    "dq-contexts/"
-)
+CONTEXT_PREFIX = ("dq-contexts/")
 
-RESPONSE_PREFIX = (
-    "dq-responses/"
-)
+RESPONSE_PREFIX = ("dq-responses/")
 
 
 def load_previous_state():
@@ -117,10 +109,7 @@ def list_parquet_files():
         )
     )
 
-    contents = response.get(
-        "Contents",
-        []
-    )
+    contents = response.get("Contents",[])
 
     parquet_files = []
 
@@ -128,9 +117,7 @@ def list_parquet_files():
 
         key = obj["Key"]
 
-        if key.endswith(
-            ".parquet"
-        ):
+        if key.endswith(".parquet"):
 
             parquet_files.append(obj)
 
@@ -150,25 +137,15 @@ def detect_changes(
 
         key = obj["Key"]
 
-        last_modified = str(
-            obj["LastModified"]
-        )
+        last_modified = str(obj["LastModified"])
 
-        current_state[key] = (
-            last_modified
-        )
+        current_state[key] = (last_modified)
 
-        previous_modified = (
-            previous_state.get(key)
-        )
+        previous_modified = (previous_state.get(key))
 
-        if previous_modified != (
-            last_modified
-        ):
+        if previous_modified != (last_modified):
 
-            changed_files.append(
-                key
-            )
+            changed_files.append(key)
 
     return (
         changed_files,
@@ -198,10 +175,7 @@ def send_slack_alert(
         )
     )
 
-    issues = llm_response.get(
-        "issues",
-        []
-    )
+    issues = llm_response.get("issues",[])
 
     issues_text = "\n".join(
 
@@ -248,9 +222,7 @@ def send_slack_alert(
 
         if response.status_code == 200:
 
-            print(
-                "Slack alert sent"
-            )
+            print("Slack alert sent")
 
         else:
 
@@ -289,10 +261,7 @@ def send_email_alert(
         )
     )
 
-    issues = llm_response.get(
-        "issues",
-        []
-    )
+    issues = llm_response.get("issues",[])
 
     issues_text = "\n".join(
 
@@ -326,17 +295,11 @@ Recommendation:
 
     try:
 
-        sender = st.secrets[
-            "EMAIL_SENDER"
-        ]
+        sender = st.secrets["EMAIL_SENDER"]
 
-        password = st.secrets[
-            "EMAIL_PASSWORD"
-        ]
+        password = st.secrets["EMAIL_PASSWORD"]
 
-        receiver = st.secrets[
-            "EMAIL_RECEIVER"
-        ]
+        receiver = st.secrets["EMAIL_RECEIVER"]
 
         msg = MIMEMultipart()
 
@@ -344,21 +307,11 @@ Recommendation:
 
         msg["To"] = receiver
 
-        msg["Subject"] = (
-            "AI Data Quality Alert"
-        )
+        msg["Subject"] = ("AI Data Quality Alert")
 
-        msg.attach(
-            MIMEText(
-                email_body,
-                "plain"
-            )
-        )
+        msg.attach(MIMEText(email_body,"plain"))
 
-        server = smtplib.SMTP(
-            "smtp.gmail.com",
-            587
-        )
+        server = smtplib.SMTP("smtp.gmail.com",587)
 
         server.starttls()
 
@@ -375,21 +328,15 @@ Recommendation:
 
         server.quit()
 
-        print(
-            "Email alert sent"
-        )
+        print("Email alert sent")
 
     except Exception as e:
 
-        print(
-            f"Email failed: {e}"
-        )
+        print(f"Email failed: {e}")
 
 
 
-def process_dataset(
-    parquet_key
-):
+def process_dataset(parquet_key):
 
     try:
 
@@ -414,9 +361,7 @@ def process_dataset(
             dataset_name
         )
 
-        context = build_llm_context(
-            profile
-        )
+        context = build_llm_context(profile)
 
         context_key = (
 
@@ -450,9 +395,7 @@ def process_dataset(
             )
         )
 
-        print(
-            "\nAI RESPONSE:\n"
-        )
+        print("\nAI RESPONSE:\n")
 
         print(
             json.dumps(
@@ -484,17 +427,11 @@ def process_dataset(
 
 def run_ai_dq_monitor():
 
-    print(
-        "\nStarting AI DQ Monitor...\n"
-    )
+    print("\nStarting AI DQ Monitor...\n")
 
-    previous_state = (
-        load_previous_state()
-    )
+    previous_state = (load_previous_state())
 
-    current_objects = (
-        list_parquet_files()
-    )
+    current_objects = (list_parquet_files())
 
     changed_files, current_state = (
 
@@ -508,21 +445,13 @@ def run_ai_dq_monitor():
 
     if not changed_files:
 
-        print(
-            "No parquet changes detected"
-        )
+        print("No parquet changes detected")
 
-    for parquet_key in (
-        changed_files
-    ):
+    for parquet_key in (changed_files):
 
-        process_dataset(
-            parquet_key
-        )
+        process_dataset(parquet_key)
 
-    save_current_state(
-        current_state
-    )
+    save_current_state(current_state)
 
     print(
         "\nAI DQ Monitoring "
