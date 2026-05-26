@@ -77,53 +77,31 @@ def build_llm_context(profile):
 
         if percentage > 0:
 
-            high_null_columns[column] = (
-                percentage
-            )
+            high_null_columns[column] = (percentage)
 
     context["null_analysis"] = {
 
-        "columns_with_nulls": (
-            high_null_columns
-        ),
+        "columns_with_nulls": (high_null_columns),
 
-        "total_columns_with_nulls": (
-            len(high_null_columns)
-        )
+        "total_columns_with_nulls": (len(high_null_columns))
     }
 
     schema_analysis = {
 
-        "schema": (
-            profile["schema"]
-        ),
+        "schema": (profile["schema"]),
 
-        "total_columns": (
-            len(profile["schema"])
-        ),
+        "total_columns": (len(profile["schema"])),
 
-        "empty_columns": (
-            profile["empty_columns"]
-        ),
+        "empty_columns": (profile["empty_columns"]),
 
-        "fully_unique_columns": (
-            profile[
-                "fully_unique_columns"
-            ]
-        )
+        "fully_unique_columns": (profile["fully_unique_columns"])
     }
 
-    context["schema_analysis"] = (
-        schema_analysis
-    )
+    context["schema_analysis"] = (schema_analysis)
 
     numeric_analysis = {}
 
-    for column, stats in (
-        profile[
-            "numeric_stats"
-        ].items()
-    ):
+    for column, stats in (profile["numeric_stats"].items()):
 
         numeric_analysis[column] = {
 
@@ -136,16 +114,12 @@ def build_llm_context(profile):
             "max": stats["max"]
         }
 
-    context["numeric_analysis"] = (
-        numeric_analysis
-    )
+    context["numeric_analysis"] = (numeric_analysis)
 
     distinct_analysis = {}
 
     for column, distinct_count in (
-        profile[
-            "distinct_counts"
-        ].items()
+        profile["distinct_counts"].items()
     ):
 
         distinct_analysis[column] = {
@@ -245,9 +219,7 @@ def load_context_from_s3(
         .decode("utf-8")
     )
 
-    context = json.loads(
-        context_data
-    )
+    context = json.loads(context_data)
 
     print(
         f"Context loaded from "
