@@ -6,7 +6,6 @@ from io import StringIO
 
 from incre import run_incremental_scd2_pipeline
 
-
 # PAGE CONFIG
 
 st.set_page_config(
@@ -23,21 +22,13 @@ st.title(
 
 # AWS CONFIG
 
-AWS_ACCESS_KEY = st.secrets[
-    "AWS_ACCESS_KEY_ID"
-]
+AWS_ACCESS_KEY = st.secrets["AWS_ACCESS_KEY_ID"]
 
-AWS_SECRET_KEY = st.secrets[
-    "AWS_SECRET_ACCESS_KEY"
-]
+AWS_SECRET_KEY = st.secrets["AWS_SECRET_ACCESS_KEY"]
 
-AWS_REGION = st.secrets[
-    "AWS_REGION"
-]
+AWS_REGION = st.secrets["AWS_REGION"]
 
-BUCKET_NAME = st.secrets[
-    "S3_BUCKET"
-]
+BUCKET_NAME = st.secrets["S3_BUCKET"]
 
 s3_client = boto3.client(
     "s3",
@@ -50,11 +41,8 @@ s3_client = boto3.client(
 # TABLES
 
 TABLES = [
-
     "customer",
-
     "loan",
-
     "document"
 ]
 
@@ -92,13 +80,11 @@ pipeline_mode = st.radio(
 
     [
         "Incremental SCD2 Pipeline",
-
         "Full ETL Pipeline"
     ]
 )
 
 st.markdown("---")
-
 
 # INPUT MODE
 
@@ -106,7 +92,6 @@ input_mode = st.radio(
     "Choose Input Method",
     [
         "Upload CSV",
-
         "Manual Entry"
     ]
 )
@@ -125,50 +110,32 @@ if input_mode == "Upload CSV":
 
         try:
 
-            df = pd.read_csv(
-                uploaded_file,
-                dtype=str
-            )
+            df = pd.read_csv(uploaded_file,dtype=str)
 
         except Exception as e:
 
-            st.error(
-                f"CSV Read Error: {e}"
-            )
+            st.error(f"CSV Read Error: {e}")
 
             st.stop()
 
-        st.success(
-            "CSV Uploaded Successfully"
-        )
+        st.success("CSV Uploaded Successfully")
 
-        st.subheader(
-            "Dataset Preview"
-        )
+        st.subheader("Dataset Preview")
 
         st.dataframe(
             df.head(20),
             width='stretch'
         )
 
-        st.write(
-            f"Rows: {len(df)}"
-        )
+        st.write(f"Rows: {len(df)}")
 
-        st.write(
-            f"Columns: {len(df.columns)}"
-        )
+        st.write(f"Columns: {len(df.columns)}")
 
         st.markdown("---")
 
-        if st.button(
-            "🚀 Run Pipeline"
-        ):
+        if st.button("🚀 Run Pipeline"):
 
-            with st.spinner(
-                "Running Incremental "
-                "Pipeline..."
-            ):
+            with st.spinner("Running Incremental "  "Pipeline"):
 
                 try:
 
@@ -211,10 +178,7 @@ if input_mode == "Upload CSV":
 
                     # CLEAN NEW DATA
 
-                    new_df.columns = (
-                        new_df.columns
-                        .str.strip()
-                    )
+                    new_df.columns = (new_df.columns.str.strip())
 
                     for col in new_df.columns:
 
@@ -227,9 +191,7 @@ if input_mode == "Upload CSV":
 
                     # DATE PARSING
 
-                    date_cols = DATE_COLUMNS[
-                        selected_table
-                    ]
+                    date_cols = DATE_COLUMNS[selected_table]
 
                     for col in date_cols:
 
@@ -257,9 +219,7 @@ if input_mode == "Upload CSV":
                         )
 
                         existing_df = pd.read_csv(
-                            StringIO(
-                                existing_csv
-                            ),
+                            StringIO(existing_csv),
                             dtype=str
                         )
 
@@ -298,9 +258,7 @@ if input_mode == "Upload CSV":
 
                     except Exception:
 
-                        existing_df = (
-                            pd.DataFrame()
-                        )
+                        existing_df = (pd.DataFrame())
 
                         st.warning(
                             "No existing CSV "
@@ -311,11 +269,8 @@ if input_mode == "Upload CSV":
                     scd_columns = [
 
                         "start_date",
-
                         "end_date",
-
                         "is_current",
-
                         "etl_timestamp"
                     ]
 
@@ -339,11 +294,7 @@ if input_mode == "Upload CSV":
 
                     if not existing_df.empty:
 
-                        all_columns = list(
-                            set(existing_df.columns)
-                            |
-                            set(new_df.columns)
-                        )
+                        all_columns = list(set(existing_df.columns) | set(new_df.columns))
 
                         existing_df = (
                             existing_df.reindex(
@@ -359,59 +310,24 @@ if input_mode == "Upload CSV":
 
                     # HASH COMPARISON
                     if existing_df.empty:
-
-                        incremental_df = (
-                            new_df.copy()
-                        )
-
+                        incremental_df = (new_df.copy())
                     else:
-
                         existing_row_hash = (
                             existing_df
                             .fillna("")
                             .astype(str)
-                            .apply(
-                                lambda row:
-                                "|".join(
-                                    map(
-                                        str,
-                                        row.values
-                                    )
-                                ),
-                                axis=1
-                            )
-                        )
+                            .apply(lambda row:"|".join(map(str,row.values)),axis=1))
 
                         new_row_hash = (
                             new_df
                             .fillna("")
                             .astype(str)
-                            .apply(
-                                lambda row:
-                                "|".join(
-                                    map(
-                                        str,
-                                        row.values
-                                    )
-                                ),
-                                axis=1
-                            )
-                        )
+                            .apply(lambda row:"|".join(map(str,row.values)),axis=1))
 
-                        incremental_df = new_df[
-                            ~new_row_hash.isin(
-                                set(
-                                    existing_row_hash
-                                )
-                            )
-                        ]
+                        incremental_df = new_df[~new_row_hash.isin(set(existing_row_hash))]
 
                     # HANDLE NO NEW ROWS
-                    if (
-                        pipeline_mode
-                        ==
-                        "Incremental SCD2 Pipeline"
-                    ):
+                    if (pipeline_mode=="Incremental SCD2 Pipeline"):
 
                         if incremental_df.empty:
 
@@ -431,21 +347,13 @@ if input_mode == "Upload CSV":
                         ignore_index=True
                     )
 
-                    before_dedup = (
-                        len(combined_df)
-                    )
+                    before_dedup = (len(combined_df))
 
                     
 
-                    after_dedup = (
-                        len(combined_df)
-                    )
+                    after_dedup = (len(combined_df))
 
-                    duplicates_removed = (
-                        before_dedup
-                        -
-                        after_dedup
-                    )
+                    duplicates_removed = (before_dedup - after_dedup)
 
                     # SAVE MERGED CSV TO S3
 
@@ -457,10 +365,7 @@ if input_mode == "Upload CSV":
 
                         if col in save_df.columns:
 
-                            save_df[col] = (
-                                save_df[col]
-                                .astype(str)
-                            )
+                            save_df[col] = (save_df[col].astype(str))
 
                     save_df.to_csv(
                         csv_buffer,
@@ -485,21 +390,11 @@ if input_mode == "Upload CSV":
                         f"{len(existing_df)}"
                     )
 
-                    st.write(
-                        f"Uploaded Rows: "
-                        f"{len(new_df)}"
-                    )
+                    st.write(f"Uploaded Rows: "f"{len(new_df)}")
 
-                    st.write(
-                        f"True Incremental Rows: "
-                        f"{len(incremental_df)}"
-                    )
+                    st.write(f"True Incremental Rows: "f"{len(incremental_df)}")
 
-                    st.write(
-                        f"Duplicate Rows "
-                        f"Removed: "
-                        f"{duplicates_removed}"
-                    )
+                    st.write(f"Duplicate Rows " f"Removed: " f"{duplicates_removed}")
 
                     st.write(
                         f"Total Rows "
@@ -509,11 +404,7 @@ if input_mode == "Upload CSV":
 
                     # PIPELINE MODE
 
-                    if (
-                        pipeline_mode
-                        ==
-                        "Incremental SCD2 Pipeline"
-                    ):
+                    if (pipeline_mode=="Incremental SCD2 Pipeline"):
 
                         st.info(
                             "STEP 2 — "
@@ -541,13 +432,9 @@ if input_mode == "Upload CSV":
                         )
                     )
 
-                    final_df = result[
-                        "final_df"
-                    ]
+                    final_df = result["final_df"]
 
-                    summary = result[
-                        "monitoring_summary"
-                    ]
+                    summary = result["monitoring_summary"]
 
                     st.success(
                         "Incremental "
@@ -564,48 +451,21 @@ if input_mode == "Upload CSV":
                         width='stretch'
                     )
 
-                    col1, col2, col3 = (
-                        st.columns(3)
-                    )
+                    col1, col2, col3 = (st.columns(3))
 
-                    col1.metric(
-                        "Total Rows",
-                        len(final_df)
-                    )
+                    col1.metric("Total Rows",len(final_df))
 
-                    if (
-                        "is_current"
-                        in final_df.columns
-                    ):
+                    if ("is_current"in final_df.columns):
 
-                        active_count = (
-                            final_df[
-                                "is_current"
-                            ]
-                            == "Y"
-                        ).sum()
+                        active_count = (final_df["is_current"]== "Y").sum()
 
-                        historical_count = (
-                            final_df[
-                                "is_current"
-                            ]
-                            == "N"
-                        ).sum()
+                        historical_count = (final_df["is_current"]== "N").sum()
 
-                        col2.metric(
-                            "Active Records",
-                            active_count
-                        )
+                        col2.metric("Active Records",active_count)
 
-                        col3.metric(
-                            "Historical Records",
-                            historical_count
-                        )
+                        col3.metric("Historical Records",historical_count)
 
-                    st.subheader(
-                        "Pipeline Monitoring "
-                        "Summary"
-                    )
+                    st.subheader("Pipeline Monitoring ""Summary")
 
                     st.json(summary)
 
@@ -623,9 +483,7 @@ if input_mode == "Upload CSV":
 
                         data=csv_download,
 
-                        file_name=(
-                            f"{selected_table}_final_output.csv"
-                        ),
+                        file_name=(f"{selected_table}_final_output.csv"),
 
                         mime="text/csv"
                     )
@@ -644,41 +502,25 @@ if input_mode == "Upload CSV":
 
 elif input_mode == "Manual Entry":
 
-    st.subheader(
-        "Manual Data Entry"
-    )
+    st.subheader("Manual Data Entry")
 
     # CUSTOMER
 
     if selected_table == "customer":
 
-        with st.form(
-            "customer_form"
-        ):
+        with st.form("customer_form"):
 
-            cust_id = st.text_input(
-                "Customer ID"
-            )
+            cust_id = st.text_input("Customer ID")
 
-            phone = st.text_input(
-                "Phone"
-            )
+            phone = st.text_input("Phone")
 
-            first_name = st.text_input(
-                "First Name"
-            )
+            first_name = st.text_input("First Name")
 
-            last_name = st.text_input(
-                "Last Name"
-            )
+            last_name = st.text_input("Last Name")
 
-            address = st.text_area(
-                "Address"
-            )
+            address = st.text_area("Address")
 
-            pincode = st.text_input(
-                "Pincode"
-            )
+            pincode = st.text_input("Pincode")
 
             submit_customer = (
                 st.form_submit_button(
@@ -708,85 +550,46 @@ elif input_mode == "Manual Entry":
                         )
                     )
 
-                    final_df = result[
-                        "final_df"
-                    ]
+                    final_df = result["final_df"]
 
-                    st.success(
-                        "Customer Record Processed"
-                    )
+                    st.success("Customer Record Processed")
                     display_df = final_df
                     st.dataframe(
-                    
                         display_df.tail(20),
-                    
                         width='stretch'
                     )
 
                 except Exception as e:
 
-                    st.error(
-                        f"Pipeline Failed: {e}"
-                    )
-
+                    st.error(f"Pipeline Failed: {e}")
 
     # LOAN
 
     elif selected_table == "loan":
 
-        with st.form(
-            "loan_form"
-        ):
+        with st.form("loan_form"):
 
-            cust_id = st.text_input(
-                "Customer ID"
-            )
+            cust_id = st.text_input("Customer ID")
 
-            loan_id = st.text_input(
-                "Loan ID"
-            )
+            loan_id = st.text_input("Loan ID")
 
-            sanction_loan = (
-                st.number_input(
-                    "Sanction Loan"
-                )
-            )
+            sanction_loan = (st.number_input("Sanction Loan"))
 
-            cibil_score = (
-                st.number_input(
-                    "CIBIL Score"
-                )
-            )
+            cibil_score = (st.number_input("CIBIL Score"))
 
-            start_date = st.date_input(
-                "Start Date"
-            )
+            start_date = st.date_input("Start Date")
 
-            disbursed_date = st.date_input(
-                "Disbursed Date"
-            )
+            disbursed_date = st.date_input("Disbursed Date")
 
-            location = st.text_input(
-                "Location"
-            )
+            location = st.text_input("Location")
 
-            pincode = st.text_input(
-                "Pincode"
-            )
+            pincode = st.text_input("Pincode")
 
-            loan_type = st.text_input(
-                "Loan Type"
-            )
+            loan_type = st.text_input("Loan Type")
 
-            unit = st.text_input(
-                "Unit"
-            )
+            unit = st.text_input("Unit")
 
-            submit_loan = (
-                st.form_submit_button(
-                    "Submit Loan Record"
-                )
-            )
+            submit_loan = (st.form_submit_button("Submit Loan Record"))
 
             if submit_loan:
 
@@ -814,63 +617,34 @@ elif input_mode == "Manual Entry":
                         )
                     )
 
-                    final_df = result[
-                        "final_df"
-                    ]
+                    final_df = result["final_df"]
 
-                    st.success(
-                        "Loan Record Processed"
-                    )
+                    st.success("Loan Record Processed")
                     display_df = final_df
                     st.dataframe(
-                    
                         display_df.tail(20),
-                    
                         width='stretch'
                     )
                 except Exception as e:
-
-                    st.error(
-                        f"Pipeline Failed: {e}"
-                    )
-
+                    st.error(f"Pipeline Failed: {e}")
 
     # DOCUMENT
 
     elif selected_table == "document":
 
-        with st.form(
-            "document_form"
-        ):
+        with st.form("document_form"):
 
-            cust_id = st.text_input(
-                "Customer ID"
-            )
+            cust_id = st.text_input("Customer ID")
 
-            kyc_status = st.selectbox(
-                "KYC Status",
-                ["Yes", "No"]
-            )
+            kyc_status = st.selectbox("KYC Status",["Yes", "No"])
 
-            annual_income = (
-                st.number_input(
-                    "Annual Income"
-                )
-            )
+            annual_income = (st.number_input("Annual Income"))
 
-            nationality = st.text_input(
-                "Nationality"
-            )
+            nationality = st.text_input("Nationality")
 
-            application_type = st.text_input(
-                "Application Type"
-            )
+            application_type = st.text_input("Application Type")
 
-            submit_document = (
-                st.form_submit_button(
-                    "Submit Document Record"
-                )
-            )
+            submit_document = (st.form_submit_button("Submit Document Record"))
 
             if submit_document:
 
@@ -893,24 +667,16 @@ elif input_mode == "Manual Entry":
                         )
                     )
 
-                    final_df = result[
-                        "final_df"
-                    ]
+                    final_df = result["final_df"]
 
-                    st.success(
-                        "Document Record Processed"
-                    )
+                    st.success("Document Record Processed")
 
                     display_df = final_df
                     st.dataframe(
-                    
                         display_df.tail(20),
-                    
                         width='stretch'
                     )
 
                 except Exception as e:
 
-                    st.error(
-                        f"Pipeline Failed: {e}"
-                    )
+                    st.error(f"Pipeline Failed: {e}")
