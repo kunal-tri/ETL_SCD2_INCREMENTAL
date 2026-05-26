@@ -1,10 +1,7 @@
-
-
 import os
 import boto3
 import pandas as pd
 from io import BytesIO, StringIO
-
 
 # AWS CONFIGURATION
 
@@ -35,9 +32,7 @@ s3_client = boto3.client(
     region_name=AWS_REGION
 )
 
-# =========================================================
 # GENERIC EXTRACT FUNCTION
-# =========================================================
 
 def extract_csv_from_s3(bucket_name, file_key):
     """
@@ -90,7 +85,6 @@ def run_extract_pipeline():
     print("STARTING S3 EXTRACTION PIPELINE")
 
     # CUSTOMER DATA
-    
 
     customer_df = extract_csv_from_s3(
         BUCKET_NAME,
