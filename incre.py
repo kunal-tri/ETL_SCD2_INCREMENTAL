@@ -36,9 +36,7 @@ AWS_REGION = os.getenv(
 TABLES = {
 
     "customer": {
-
         "business_key": "cust_id",
-
         "columns": [
             "cust_id",
             "Phone",
@@ -47,15 +45,12 @@ TABLES = {
             "Address",
             "Pincode"
         ],
-
         "s3_key":
         "output/parquet-data/customer.parquet"
     },
 
     "loan": {
-
         "business_key": "cust_id",
-
         "columns": [
             "cust_id",
             "loan_id",
@@ -74,9 +69,7 @@ TABLES = {
     },
 
     "document": {
-
         "business_key": "cust_id",
-
         "columns": [
             "cust_id",
             "KYC_Status",
@@ -95,17 +88,11 @@ def send_email_alert(message):
 
     try:
 
-        sender = st.secrets[
-            "EMAIL_SENDER"
-        ]
+        sender = st.secrets["EMAIL_SENDER"]
 
-        password = st.secrets[
-            "EMAIL_PASSWORD"
-        ]
+        password = st.secrets["EMAIL_PASSWORD"]
 
-        receiver = st.secrets[
-            "EMAIL_RECEIVER"
-        ]
+        receiver = st.secrets["EMAIL_RECEIVER"]
 
         msg = MIMEMultipart()
 
@@ -113,21 +100,11 @@ def send_email_alert(message):
 
         msg["To"] = receiver
 
-        msg["Subject"] = (
-            "ETL Pipeline Alert"
-        )
+        msg["Subject"] = ("ETL Pipeline Alert")
 
-        msg.attach(
-            MIMEText(
-                message,
-                "plain"
-            )
-        )
+        msg.attach(MIMEText(message,"plain"))
 
-        server = smtplib.SMTP(
-            "smtp.gmail.com",
-            587
-        )
+        server = smtplib.SMTP("smtp.gmail.com",587)
 
         server.starttls()
 
@@ -154,13 +131,9 @@ def send_slack_alert(message):
 
     try:
 
-        SLACK_WEBHOOK_URL = st.secrets[
-            "SLACK_WEBHOOK_URL_2"
-        ]
+        SLACK_WEBHOOK_URL = st.secrets["SLACK_WEBHOOK_URL_2"]
 
-        payload = {
-            "text": message
-        }
+        payload = {"text": message}
 
         requests.post(
             SLACK_WEBHOOK_URL,
@@ -168,15 +141,11 @@ def send_slack_alert(message):
             timeout=10
         )
 
-        print(
-            "Slack alert sent"
-        )
+        print("Slack alert sent")
 
     except Exception as e:
 
-        print(
-            f"Slack alert failed: {e}"
-        )
+        print(f"Slack alert failed: {e}")
 
 
 def run_incremental_scd2_pipeline(
@@ -191,17 +160,11 @@ def run_incremental_scd2_pipeline(
             f"{table_name}"
         )
 
-    AWS_ACCESS_KEY = st.secrets[
-        "AWS_ACCESS_KEY_ID"
-    ]
+    AWS_ACCESS_KEY = st.secrets["AWS_ACCESS_KEY_ID"]
 
-    AWS_SECRET_KEY = st.secrets[
-        "AWS_SECRET_ACCESS_KEY"
-    ]
+    AWS_SECRET_KEY = st.secrets["AWS_SECRET_ACCESS_KEY"]
 
-    BUCKET_NAME = st.secrets[
-        "S3_BUCKET"
-    ]
+    BUCKET_NAME = st.secrets["S3_BUCKET"]
 
     s3_client = boto3.client(
         "s3",
@@ -210,43 +173,23 @@ def run_incremental_scd2_pipeline(
         region_name=AWS_REGION
     )
 
-    table_config = TABLES[
-        table_name
-    ]
+    table_config = TABLES[table_name]
 
-    BUSINESS_KEY = table_config[
-        "business_key"
-    ]
+    BUSINESS_KEY = table_config["business_key"]
 
-    COLUMNS = table_config[
-        "columns"
-    ]
+    COLUMNS = table_config["columns"]
 
-    S3_KEY = table_config[
-        "s3_key"
-    ]
+    S3_KEY = table_config["s3_key"]
 
-    source_df.columns = (
-        source_df.columns.str.strip()
-    )
+    source_df.columns = (source_df.columns.str.strip())
 
-    source_df = (
-        source_df.drop_duplicates()
-    )
+    source_df = (source_df.drop_duplicates())
 
-    uploaded_columns = set(
-        source_df.columns
-    )
+    uploaded_columns = set(source_df.columns)
 
-    expected_columns = set(
-        COLUMNS
-    )
+    expected_columns = set(COLUMNS)
 
-    missing_columns = list(
-        expected_columns
-        -
-        uploaded_columns
-    )
+    missing_columns = list(expected_columns-uploaded_columns)
 
     extra_columns = list(uploaded_columns - expected_columns)
 
@@ -282,20 +225,13 @@ def run_incremental_scd2_pipeline(
             f"Incremental merge stopped."
         )
 
-        print(
-            anomaly_message
-        )
+        print(anomaly_message)
 
-        send_email_alert(
-            anomaly_message
-        )
-        send_slack_alert(
-            anomaly_message
-        )
+        send_email_alert(anomaly_message)
+        
+        send_slack_alert(anomaly_message)
 
-        raise ValueError(
-            anomaly_message
-        )
+        raise ValueError(anomaly_message)
 
     string_columns = [
 
@@ -382,13 +318,9 @@ def run_incremental_scd2_pipeline(
             Key=S3_KEY
         )
 
-        parquet_data = BytesIO(
-            response["Body"].read()
-        )
+        parquet_data = BytesIO(response["Body"].read())
 
-        target_df = pd.read_parquet(
-            parquet_data
-        )
+        target_df = pd.read_parquet(parquet_data)
 
         print(
             "Existing parquet "
@@ -402,9 +334,7 @@ def run_incremental_scd2_pipeline(
             f"{e}"
         )
 
-        target_df = pd.DataFrame(
-            columns=COLUMNS
-        )
+        target_df = pd.DataFrame(columns=COLUMNS)
 
     for col in string_columns:
 
@@ -428,9 +358,7 @@ def run_incremental_scd2_pipeline(
         "etl_timestamp": pd.NaT
     }
 
-    for col, default_value in (
-        scd_columns.items()
-    ):
+    for col, default_value in (scd_columns.items()):
 
         if col not in target_df.columns:
 
@@ -463,14 +391,7 @@ def run_incremental_scd2_pipeline(
 
         existing_rows = final_df[(final_df[BUSINESS_KEY]==new_record[BUSINESS_KEY]) &(final_df["is_current"]== "Y")]
 
-        now = (
-            datetime.now(
-                ZoneInfo("Asia/Kolkata")
-            )
-            .replace(tzinfo=None,
-                     microsecond=0)
-            
-        )
+        now = (datetime.now(ZoneInfo("Asia/Kolkata")).replace(tzinfo=None,microsecond=0))
 
         new_record["start_date"] = now
 
@@ -503,9 +424,7 @@ def run_incremental_scd2_pipeline(
 
         else:
 
-            current_record = (
-                existing_rows.iloc[0]
-            )
+            current_record = (existing_rows.iloc[0])
 
             exact_match = True
 
@@ -519,28 +438,18 @@ def run_incremental_scd2_pipeline(
 
                     continue
 
-                if (
-                    str(new_val).strip()
-                    !=
-                    str(old_val).strip()
-                ):
+                if (str(new_val).strip()!=str(old_val).strip()):
 
                     exact_match = False
-
                     break
 
             if exact_match:
 
-                print(
-                    f"Duplicate skipped: "
-                    f"{new_record[BUSINESS_KEY]}"
-                )
+                print(f"Duplicate skipped: " f"{new_record[BUSINESS_KEY]}")
 
                 duplicate_records_count += 1
 
-                duplicate_records.append(
-                    new_record
-                )
+                duplicate_records.append(new_record)
 
                 continue
 
@@ -571,35 +480,16 @@ def run_incremental_scd2_pipeline(
 
                 historical_records_count += 1
 
-                historical_records.append(
-                    new_record
-                )
+                historical_records.append(new_record)
 
                 active_mask = (
-                    (
-                        final_df[BUSINESS_KEY]
-                        ==
-                        new_record[
-                            BUSINESS_KEY
-                        ]
-                    )
+                    (final_df[BUSINESS_KEY]==new_record[BUSINESS_KEY])
                     &
-                    (
-                        final_df[
-                            "is_current"
-                        ] == "Y"
-                    )
-                )
+                    (final_df["is_current"] == "Y"))
 
-                final_df.loc[
-                    active_mask,
-                    "is_current"
-                ] = "N"
+                final_df.loc[active_mask,"is_current"] = "N"
 
-                final_df.loc[
-                    active_mask,
-                    "end_date"
-                ] = now
+                final_df.loc[active_mask,"end_date"] = now
 
                 final_df = pd.concat(
                     [
@@ -657,71 +547,46 @@ def run_incremental_scd2_pipeline(
 
     try:
 
-        print(
-            "\nStarting AI DQ Analysis\n"
-        )
+        print("\nStarting AI DQ Analysis\n")
 
         run_ai_dq(
-
             bucket_name=BUCKET_NAME,
-
             parquet_key=S3_KEY,
-
             dataset_name=table_name
         )
 
-        print(
-            "\nAI DQ Completed\n"
-        )
+        print("\nAI DQ Completed\n")
 
     except Exception as ai_error:
 
-        print(
-            f"\nAI DQ Failed: "
-            f"{ai_error}"
-        )
+        print(f"\nAI DQ Failed: "f"{ai_error}")
 
-        send_email_alert(
-            f"AI DQ Failed: {ai_error}"
-        )
-        send_slack_alert(
-            f"AI DQ Failed: {ai_error}"
-        )
+        send_email_alert(f"AI DQ Failed: {ai_error}")
+        send_slack_alert(f"AI DQ Failed: {ai_error}")
 
     monitoring_summary = {
-
         "table_name": table_name,
-
         "run_timestamp":
         (
             datetime.now(
                 ZoneInfo("Asia/Kolkata")
             )
             .replace(tzinfo=None,microsecond=0)
-        ).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        ),
+        ).strftime("%Y-%m-%d %H:%M:%S"),
 
-        "total_rows_after_update":
-        len(final_df),
+        "total_rows_after_update":len(final_df),
 
-        "new_records_count":
-        new_records_count,
+        "new_records_count":new_records_count,
 
-        "duplicate_records_count":
-        duplicate_records_count,
+        "duplicate_records_count":duplicate_records_count,
 
-        "historical_records_count":
-        historical_records_count,
+        "historical_records_count":historical_records_count,
 
-        "new_records":
-        new_records,
+        "new_records":new_records,
 
-        "duplicate_records":
-        duplicate_records,
+        "duplicate_records":duplicate_records,
 
-        "historical_records":
-        historical_records
+        "historical_records":historical_records
     }
 
     timestamp_folder = (
@@ -752,15 +617,9 @@ def run_incremental_scd2_pipeline(
         )
     )
 
-    print(
-        f"Monitoring summary uploaded: "
-        f"{monitoring_key}"
-    )
+    print(f"Monitoring summary uploaded: "f"{monitoring_key}")
 
     return {
-
         "final_df": final_df,
-
-        "monitoring_summary":
-        monitoring_summary
+        "monitoring_summary":monitoring_summary
     }
