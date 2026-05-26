@@ -45,30 +45,23 @@ from dq.ai_dq_runner import (
 )
 
 
-INDIA_TZ = ZoneInfo(
-    "Asia/Kolkata"
-)
+INDIA_TZ = ZoneInfo("Asia/Kolkata")
 
 
-BUCKET_NAME = st.secrets[
-    "S3_BUCKET"
-]
+BUCKET_NAME = st.secrets["S3_BUCKET"]
 
 
 CUSTOMER_PARQUET_KEY = (
-
     "output/parquet-data/"
     "customer.parquet"
 )
 
 LOAN_PARQUET_KEY = (
-
     "output/parquet-data/"
     "loan.parquet"
 )
 
 TRANSACTION_PARQUET_KEY = (
-
     "output/parquet-data/"
     "transaction.parquet"
 )
@@ -76,13 +69,10 @@ TRANSACTION_PARQUET_KEY = (
 
 def run_etl_pipeline():
 
-    start_time = datetime.now(
-        INDIA_TZ
-    )
+    start_time = datetime.now(INDIA_TZ)
 
-    print(
-        "STARTING END-TO-END "
-        "NBFC ETL PIPELINE"
+    print("STARTING END-TO-END " 
+          "NBFC ETL PIPELINE"
     )
 
     try:
@@ -134,9 +124,7 @@ def run_etl_pipeline():
 
             bucket_name=BUCKET_NAME,
 
-            parquet_key=(
-                CUSTOMER_PARQUET_KEY
-            ),
+            parquet_key=(CUSTOMER_PARQUET_KEY),
 
             dataset_name="customer"
         )
@@ -145,9 +133,7 @@ def run_etl_pipeline():
 
             bucket_name=BUCKET_NAME,
 
-            parquet_key=(
-                LOAN_PARQUET_KEY
-            ),
+            parquet_key=(LOAN_PARQUET_KEY),
 
             dataset_name="loan"
         )
@@ -156,9 +142,7 @@ def run_etl_pipeline():
 
             bucket_name=BUCKET_NAME,
 
-            parquet_key=(
-                TRANSACTION_PARQUET_KEY
-            ),
+            parquet_key=(TRANSACTION_PARQUET_KEY),
 
             dataset_name="transaction"
         )
@@ -168,13 +152,9 @@ def run_etl_pipeline():
             "AI DQ PIPELINE COMPLETED\n"
         )
 
-        end_time = datetime.now(
-            INDIA_TZ
-        )
+        end_time = datetime.now(INDIA_TZ)
 
-        total_time = (
-            end_time - start_time
-        )
+        total_time = (end_time - start_time)
 
         print(
             "NBFC ETL PIPELINE "
@@ -221,13 +201,9 @@ def run_etl_pipeline():
 
     except Exception as e:
 
-        print(
-            "\nETL PIPELINE FAILED"
-        )
+        print("\nETL PIPELINE FAILED")
 
-        print(
-            f"\nError: {e}"
-        )
+        print(f"\nError: {e}")
 
 
 if __name__ == "__main__":
