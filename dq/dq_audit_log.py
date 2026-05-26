@@ -41,50 +41,23 @@ def save_audit_log(
 
     audit_data = {
 
-        "dataset_name":
-        dataset_name,
+        "dataset_name":dataset_name,
 
-        "audit_timestamp":
-        str(timestamp),
+        "audit_timestamp":str(timestamp),
 
-        "severity":
-        llm_response.get(
-            "severity"
-        ),
+        "severity":llm_response.get("severity"),
 
-        "issues":
-        llm_response.get(
-            "issues",
-            []
-        ),
+        "issues":llm_response.get("issues",[]),
 
-        "recommended_fixes":
-        llm_response.get(
-            "recommended_fixes",
-            []
-        ),
+        "recommended_fixes":llm_response.get("recommended_fixes",[]),
 
-        "remediation_applied":
-        remediation_result.get(
-            "remediation_applied",
-            False
-        ),
+        "remediation_applied":remediation_result.get("remediation_applied",False),
 
-        "remediation_log":
-        remediation_result.get(
-            "log",
-            []
-        ),
+        "remediation_log":remediation_result.get("log",[]),
 
-        "summary":
-        llm_response.get(
-            "summary"
-        ),
+        "summary":llm_response.get("summary"),
 
-        "recommendation":
-        llm_response.get(
-            "recommendation"
-        )
+        "recommendation":llm_response.get("recommendation")
     }
 
     object_key = (
@@ -106,9 +79,7 @@ def save_audit_log(
             indent=4
         ),
 
-        ContentType=(
-            "application/json"
-        )
+        ContentType=("application/json")
     )
 
     print(
