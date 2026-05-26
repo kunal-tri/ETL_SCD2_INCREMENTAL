@@ -21,38 +21,24 @@ from dq.llm_api import (
 )
 
 
-AWS_ACCESS_KEY = st.secrets[
-    "AWS_ACCESS_KEY_ID"
-]
+AWS_ACCESS_KEY = st.secrets["AWS_ACCESS_KEY_ID"]
 
-AWS_SECRET_KEY = st.secrets[
-    "AWS_SECRET_ACCESS_KEY"
-]
+AWS_SECRET_KEY = st.secrets["AWS_SECRET_ACCESS_KEY"]
 
-AWS_REGION = st.secrets[
-    "AWS_REGION"
-]
+AWS_REGION = st.secrets["AWS_REGION"]
 
-BUCKET_NAME = st.secrets[
-    "S3_BUCKET"
-]
+BUCKET_NAME = st.secrets["S3_BUCKET"]
 
-SLACK_WEBHOOK_URL = st.secrets[
-    "SLACK_WEBHOOK_URL"
-]
+SLACK_WEBHOOK_URL = st.secrets["SLACK_WEBHOOK_URL"]
 
 
 s3_client = boto3.client(
 
     "s3",
 
-    aws_access_key_id=(
-        AWS_ACCESS_KEY
-    ),
+    aws_access_key_id=(AWS_ACCESS_KEY),
 
-    aws_secret_access_key=(
-        AWS_SECRET_KEY
-    ),
+    aws_secret_access_key=(AWS_SECRET_KEY),
 
     region_name=AWS_REGION
 )
@@ -72,10 +58,7 @@ def load_previous_state():
 
     try:
 
-        with open(
-            STATE_FILE,
-            "r"
-        ) as file:
+        with open(STATE_FILE,"r") as file:
 
             return json.load(file)
 
@@ -86,10 +69,7 @@ def load_previous_state():
 
 def save_current_state(state):
 
-    with open(
-        STATE_FILE,
-        "w"
-    ) as file:
+    with open(STATE_FILE,"w") as file:
 
         json.dump(
             state,
@@ -147,10 +127,7 @@ def detect_changes(
 
             changed_files.append(key)
 
-    return (
-        changed_files,
-        current_state
-    )
+    return (changed_files,current_state)
 
 
 def send_slack_alert(
