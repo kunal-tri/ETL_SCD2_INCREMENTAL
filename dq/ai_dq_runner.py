@@ -174,9 +174,7 @@ def send_slack_alert(
 
         if response.status_code == 200:
 
-            print(
-            "Slack alert sent"
-        )
+            print("Slack alert sent")
 
         else:
 
@@ -195,9 +193,7 @@ def send_slack_alert(
 
     if response.status_code == 200:
 
-        print(
-            "Slack alert sent"
-        )
+        print("Slack alert sent")
 
     else:
 
@@ -328,17 +324,11 @@ Recommendation:
 
     try:
 
-        sender = st.secrets[
-            "EMAIL_SENDER"
-        ]
+        sender = st.secrets["EMAIL_SENDER"]
 
-        password = st.secrets[
-            "EMAIL_PASSWORD"
-        ]
+        password = st.secrets["EMAIL_PASSWORD"]
 
-        receiver = st.secrets[
-            "EMAIL_RECEIVER"
-        ]
+        receiver = st.secrets["EMAIL_RECEIVER"]
 
         msg = MIMEMultipart()
 
@@ -346,21 +336,11 @@ Recommendation:
 
         msg["To"] = receiver
 
-        msg["Subject"] = (
-            "AI Data Quality Alert"
-        )
+        msg["Subject"] = ("AI Data Quality Alert")
 
-        msg.attach(
-            MIMEText(
-                email_body,
-                "plain"
-            )
-        )
+        msg.attach(MIMEText(email_body,"plain"))
 
-        server = smtplib.SMTP(
-            "smtp.gmail.com",
-            587
-        )
+        server = smtplib.SMTP("smtp.gmail.com",587)
 
         server.starttls()
 
@@ -377,15 +357,11 @@ Recommendation:
 
         server.quit()
 
-        print(
-            "Email alert sent"
-        )
+        print("Email alert sent")
 
     except Exception as e:
 
-        print(
-            f"Email failed: {e}"
-        )
+        print(f"Email failed: {e}")
 
 
 def run_ai_dq(
@@ -413,15 +389,11 @@ def run_ai_dq(
         dataset_name
     )
 
-    print(
-        "\nProfile Generated\n"
-    )
+    print("\nProfile Generated\n")
 
     # STEP 2 — BUILD CONTEXT
 
-    context = build_llm_context(
-        profile
-    )
+    context = build_llm_context(profile)
 
     context_key = (
 
@@ -438,9 +410,7 @@ def run_ai_dq(
         context_key
     )
 
-    print(
-        "\nContext Stored in S3\n"
-    )
+    print("\nContext Stored in S3\n")
 
     # STEP 3 — GROQ ANALYSIS
 
@@ -461,9 +431,7 @@ def run_ai_dq(
         )
     )
 
-    print(
-        "\nAI RESPONSE:\n"
-    )
+    print("\nAI RESPONSE:\n")
 
     print(
         json.dumps(
@@ -491,9 +459,7 @@ def run_ai_dq(
         )
     )
 
-    print(
-        "\nRemediation Result:\n"
-    )
+    print("\nRemediation Result:\n")
 
     print(
         json.dumps(
@@ -517,13 +483,9 @@ def run_ai_dq(
         )
     )
 
-    print(
-        "\nAudit Log Saved:\n"
-    )
+    print("\nAudit Log Saved:\n")
 
-    print(
-        audit_log_key
-    )
+    print(audit_log_key)
 
     # STEP 6 — EMAIL/SLACK ALERT
     send_slack_alert(
