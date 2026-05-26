@@ -28,9 +28,7 @@ from dq.dq_audit_log import (
 )
 
 
-SLACK_WEBHOOK_URL = st.secrets[
-    "SLACK_WEBHOOK_URL"
-]
+SLACK_WEBHOOK_URL = st.secrets["SLACK_WEBHOOK_URL"]
 
 def send_slack_alert(
 
@@ -60,15 +58,9 @@ def send_slack_alert(
         )
     )
 
-    issues = llm_response.get(
-        "issues",
-        []
-    )
+    issues = llm_response.get("issues",[])
 
-    fixes = llm_response.get(
-        "recommended_fixes",
-        []
-    )
+    fixes = llm_response.get("recommended_fixes",[])
 
     remediation_applied = (
         remediation_result.get(
@@ -77,12 +69,7 @@ def send_slack_alert(
         )
     )
 
-    remediation_log = (
-        remediation_result.get(
-            "log",
-            []
-        )
-    )
+    remediation_log = (remediation_result.get("log",[]))
 
     issues_text = "\n".join(
 
@@ -111,7 +98,6 @@ def send_slack_alert(
 
         [
             str(log)
-
             for log in remediation_log
         ]
     )
@@ -162,15 +148,9 @@ def send_slack_alert(
         timeout=10
     )
 
-        print(
-            f"\nSlack Status Code: "
-            f"{response.status_code}"
-            )
+        print(f"\nSlack Status Code: "f"{response.status_code}")
 
-        print(
-                f"\nSlack Response: "
-                f"{response.text}"
-            )
+        print(f"\nSlack Response: "f"{response.text}")
 
         if response.status_code == 200:
 
@@ -178,18 +158,11 @@ def send_slack_alert(
 
         else:
 
-            print(
-
-            f"Slack Error: "
-            f"{response.status_code}"
-        )
+            print(f"Slack Error: "f"{response.status_code}")
 
     except Exception as e:
 
-        print(
-        f"\nSlack Exception: "
-        f"{e}"
-    )
+        print(f"\nSlack Exception: "f"{e}")
 
     if response.status_code == 200:
 
@@ -226,36 +199,15 @@ def send_email_alert(
         "No summary"
     )
 
-    recommendation = (
-        llm_response.get(
-            "recommendation",
-            "No recommendation"
-        )
-    )
+    recommendation = (llm_response.get("recommendation","No recommendation"))
 
-    issues = llm_response.get(
-        "issues",
-        []
-    )
+    issues = llm_response.get("issues",[])
 
-    fixes = llm_response.get(
-        "recommended_fixes",
-        []
-    )
+    fixes = llm_response.get("recommended_fixes",[])
 
-    remediation_applied = (
-        remediation_result.get(
-            "remediation_applied",
-            False
-        )
-    )
+    remediation_applied = (remediation_result.get("remediation_applied",False))
 
-    remediation_log = (
-        remediation_result.get(
-            "log",
-            []
-        )
-    )
+    remediation_log = (remediation_result.get("log",[]))
 
     issues_text = "\n".join(
 
@@ -373,10 +325,7 @@ def run_ai_dq(
     dataset_name
 ):
 
-    print(
-        f"\nRunning AI DQ for "
-        f"{dataset_name}\n"
-    )
+    print(f"\nRunning AI DQ for " f"{dataset_name}\n")
 
     # STEP 1 — GENERATE PROFILE
 
@@ -510,10 +459,7 @@ def run_ai_dq(
         audit_log_key
     )
 
-    print(
-        "\nAI DQ Pipeline "
-        "Completed\n"
-    )
+    print("\nAI DQ Pipeline " "Completed\n")
 
     return {
 
