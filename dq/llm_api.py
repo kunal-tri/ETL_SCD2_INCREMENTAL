@@ -244,16 +244,11 @@ def parse_llm_response(response):
 
             "severity": "ERROR",
 
-            "issues": [
-                "JSON parsing failed"
-            ],
+            "issues": ["JSON parsing failed"],
 
             "root_cause": str(e),
 
-            "recommendation": (
-                "Check Groq response "
-                "format"
-            ),
+            "recommendation": ("Check Groq response ""format"),
 
             "summary": response,
 
@@ -281,19 +276,13 @@ def analyze_dataset_from_s3(
 
         if not context:
 
-            raise Exception(
-                "Context loading failed"
-            )
+            raise Exception("Context loading failed")
 
         prompt = build_prompt(context)
 
         llm_response = call_llm(prompt)
 
-        parsed_response = (
-            parse_llm_response(
-                llm_response
-            )
-        )
+        parsed_response = (parse_llm_response(llm_response))
 
         save_json_to_s3(
 
