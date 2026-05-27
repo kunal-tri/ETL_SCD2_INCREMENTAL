@@ -518,19 +518,18 @@ def run_incremental_scd2_pipeline(
         "etl_timestamp"
     ]
 
+    
     for col in timestamp_columns:
 
         if col in final_df.columns:
-
+    
             final_df[col] = (
                 pd.to_datetime(
                     final_df[col],
                     errors="coerce"
                 )
-                .dt.floor("ms")
-                .astype("datetime64[ms]")
             )
-
+            
     parquet_buffer = BytesIO()
 
     final_df.to_parquet(
