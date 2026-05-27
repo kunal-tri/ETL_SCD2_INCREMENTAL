@@ -270,8 +270,8 @@ def run_incremental_scd2_pipeline(
 
             source_df[col] = (
                 source_df[col]
-                .astype(str)
                 .fillna("")
+                .astype("string")
                 .str.strip()
             )
 
@@ -321,7 +321,26 @@ def run_incremental_scd2_pipeline(
         parquet_data = BytesIO(response["Body"].read())
 
         target_df = pd.read_parquet(parquet_data)
-
+        
+        timestamp_columns = [
+            "start_date",
+            "end_date",
+            "etl_timestamp"
+        ]
+        
+        for col in timestamp_columns:
+        
+            if col in target_df.columns:
+        
+                target_df[col] = pd.to_datetime(
+                    target_df[col],
+                    errors="coerce"
+                )
+        
+                target_df[col] = (
+                    target_df[col]
+                    .astype("datetime64[ns]")
+                )
         print(
             "Existing parquet "
             "loaded from S3"
@@ -342,8 +361,8 @@ def run_incremental_scd2_pipeline(
 
             target_df[col] = (
                 target_df[col]
-                .astype(str)
                 .fillna("")
+                .astype("string")
                 .str.strip()
             )
 
@@ -365,6 +384,20 @@ def run_incremental_scd2_pipeline(
             target_df[col] = default_value
 
     final_df = target_df.copy()
+    timestamp_columns = [
+        "start_date",
+        "end_date",
+        "etl_timestamp"
+    ]
+    
+    for col in timestamp_columns:
+    
+        if col in final_df.columns:
+    
+            final_df[col] = pd.to_datetime(
+                final_df[col],
+                errors="coerce"
+            )
 
     compare_columns = [
 
@@ -507,8 +540,8 @@ def run_incremental_scd2_pipeline(
 
             final_df[col] = (
                 final_df[col]
-                .astype(str)
                 .fillna("")
+                .astype("string")
                 .str.strip()
             )
 
