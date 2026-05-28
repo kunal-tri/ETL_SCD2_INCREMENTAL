@@ -168,7 +168,8 @@ if input_mode == "Upload CSV":
                             "folder/"
                             "nbfc_document_data.csv"
                         )
-
+                    date_cols = DATE_COLUMNS[selected_table]
+                    
                     merge_result = merge_csv_with_s3(
                         s3_client=s3_client,
                         bucket_name=BUCKET_NAME,
@@ -184,6 +185,8 @@ if input_mode == "Upload CSV":
                     incremental_df = merge_result["incremental_df"]
                     
                     combined_df = merge_result["combined_df"]
+                    
+                    duplicates_removed = 0
                     
                     st.success(
                         "CSV merged "
