@@ -1,36 +1,41 @@
 import requests
 import smtplib
+import streamlit as st
 
 from email.mime.text import MIMEText
 
 
 # SLACK ALERT
-
 def send_slack_alert(message):
 
     try:
 
-        webhook_url = "YOUR_SLACK_WEBHOOK_URL_2"
+        webhook_url = st.secrets["SLACK_WEBHOOK_URL_2"]
 
-        payload = {
-            "text": message
-        }
+        payload = {"text": message}
 
-        requests.post(
+        response = requests.post(
             webhook_url,
             json=payload,
             timeout=10
         )
 
+        if response.status_code != 200:
+
+            raise Exception(
+                f"Slack Error: "
+                f"{response.status_code} "
+                f"{response.text}"
+            )
+
+        print("Slack Alert Sent Successfully")
+
     except Exception as e:
 
-        print(
-            f"Slack Alert Failed: {e}"
-        )
+        print(f"Slack Alert Failed: {e}")
 
 
 # EMAIL ALERT
-
 def send_email_alert(
     subject,
     body
@@ -38,11 +43,11 @@ def send_email_alert(
 
     try:
 
-        sender_email = "YOUR_EMAIL@gmail.com"
+        sender_email = st.secrets["EMAIL_SENDER"]
 
-        sender_password = "YOUR_APP_PASSWORD"
+        sender_password = st.secrets["EMAIL_PASSWORD"]
 
-        receiver_email = "YOUR_EMAIL@gmail.com"
+        receiver_email = st.secrets["EMAIL_RECEIVER"]
 
         msg = MIMEText(body)
 
@@ -72,8 +77,8 @@ def send_email_alert(
 
         server.quit()
 
+        print("Email Alert Sent Successfully")
+
     except Exception as e:
 
-        print(
-            f"Email Alert Failed: {e}"
-        )
+        print(f"Email Alert Failed: {e}")
